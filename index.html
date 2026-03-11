@@ -3,51 +3,53 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>JSService Pro · File manager + CodeMirror</title>
-    <!-- CodeMirror 5 (simple, reliable) -->
+    <title>JSService Pro · drag‑and‑drop JS editor</title>
+    <!-- CodeMirror 5 -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/codemirror.min.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/codemirror.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/mode/javascript/javascript.min.js"></script>
-    <!-- JSZip for exporting project -->
+    <!-- JSZip for export -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
-    <!-- Our styles -->
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
     <div class="window">
         <div class="title-bar">
-            <span class="title">📁 JSService Pro – local file manager & editor</span>
+            <span class="title">📁 JSService Pro – real JS editor · drag & drop files</span>
             <span class="window-controls"> □ ✕</span>
         </div>
         <div class="content main-panel">
-            <!-- Left: file tree -->
+            <!-- Left: file tree + drop zone -->
             <div class="file-panel">
                 <div class="panel-header">
                     <button id="new-file" title="New file">📄 New File</button>
                     <button id="new-folder" title="New folder">📁 New Folder</button>
                     <button id="download-project" title="Download all as ZIP">📦 Export ZIP</button>
                 </div>
-                <div class="tree-container" id="tree-container">
-                    <!-- Tree will be rendered here -->
+                <!-- Drop zone wrapper -->
+                <div class="drop-zone" id="dropZone">
+                    <div class="drop-message">📂 Drop .js files here</div>
+                    <div class="tree-container" id="tree-container"></div>
                 </div>
             </div>
 
-            <!-- Right: editor -->
+            <!-- Right: editor + run output -->
             <div class="editor-panel">
                 <div class="panel-header">
                     <span id="current-file">No file selected</span>
                     <button id="save-file">💾 Save</button>
+                    <button id="run-file" style="margin-left:auto;">▶ Run (sandboxed)</button>
                 </div>
                 <textarea id="editor"></textarea>
+                <div id="output" style="display:none; background:#1e1e1e; color:#0f0; padding:6px; font-family:monospace; border:3px inset #808080; margin-top:6px; max-height:150px; overflow:auto;"></div>
             </div>
         </div>
 
         <div class="status-bar">
-            <span id="status">Ready · Drag files to move · You are responsible for your code.</span>
+            <span id="status">Drop a .js file anywhere on the left to begin</span>
         </div>
     </div>
 
-    <!-- Context menu for rename/delete (simple built‑in) -->
     <script src="script.js"></script>
 </body>
 </html>
