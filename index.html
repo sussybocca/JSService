@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JSService Pro · File manager + CodeMirror</title>
+    <!-- CodeMirror 5 (simple, reliable) -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/codemirror.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/codemirror.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/mode/javascript/javascript.min.js"></script>
+    <!-- JSZip for exporting project -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+    <!-- Our styles -->
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="window">
+        <div class="title-bar">
+            <span class="title">📁 JSService Pro – local file manager & editor</span>
+            <span class="window-controls"> □ ✕</span>
+        </div>
+        <div class="content main-panel">
+            <!-- Left: file tree -->
+            <div class="file-panel">
+                <div class="panel-header">
+                    <button id="new-file" title="New file">📄 New File</button>
+                    <button id="new-folder" title="New folder">📁 New Folder</button>
+                    <button id="download-project" title="Download all as ZIP">📦 Export ZIP</button>
+                </div>
+                <div class="tree-container" id="tree-container">
+                    <!-- Tree will be rendered here -->
+                </div>
+            </div>
+
+            <!-- Right: editor -->
+            <div class="editor-panel">
+                <div class="panel-header">
+                    <span id="current-file">No file selected</span>
+                    <button id="save-file">💾 Save</button>
+                </div>
+                <textarea id="editor"></textarea>
+            </div>
+        </div>
+
+        <div class="status-bar">
+            <span id="status">Ready · Drag files to move · You are responsible for your code.</span>
+        </div>
+    </div>
+
+    <!-- Context menu for rename/delete (simple built‑in) -->
+    <script src="script.js"></script>
+</body>
+</html>
