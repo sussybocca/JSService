@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>JSService Pro · drag‑and‑drop JS editor</title>
+    <title>JSService · full JavaScript language explorer</title>
     <!-- CodeMirror 5 -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/codemirror.min.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/codemirror.min.js"></script>
@@ -15,7 +15,7 @@
 <body>
     <div class="window">
         <div class="title-bar">
-            <span class="title">📁 JSService Pro – real JS editor · drag & drop files</span>
+            <span class="title">📁 JSService – full JavaScript language as files</span>
             <span class="window-controls"> □ ✕</span>
         </div>
         <div class="content main-panel">
@@ -25,10 +25,10 @@
                     <button id="new-file" title="New file">📄 New File</button>
                     <button id="new-folder" title="New folder">📁 New Folder</button>
                     <button id="download-project" title="Download all as ZIP">📦 Export ZIP</button>
+                    <button id="load-language" title="Generate JavaScript language tree">🔧 Load Language</button>
                 </div>
-                <!-- Drop zone wrapper -->
                 <div class="drop-zone" id="dropZone">
-                    <div class="drop-message">📂 Drop .js files here</div>
+                    <div class="drop-message">📂 Drop any .js file to generate the language tree</div>
                     <div class="tree-container" id="tree-container"></div>
                 </div>
             </div>
@@ -46,7 +46,7 @@
         </div>
 
         <div class="status-bar">
-            <span id="status">Drop a .js file anywhere on the left to begin</span>
+            <span id="status">Drop a .js file to generate the JavaScript language tree</span>
         </div>
     </div>
 
