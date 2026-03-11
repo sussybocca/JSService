@@ -1188,7 +1188,7 @@ Promise.prototype.finally = function(onFinally) {
 
         const iframe = document.createElement('iframe');
         iframe.style.display = 'none';
-        iframe.sandbox = 'allow-scripts';
+      iframe.sandbox = 'allow-scripts allow-same-origin';
         document.body.appendChild(iframe);
 
         const outputDiv = document.getElementById('output');
