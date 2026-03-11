@@ -1,30 +1,290 @@
-// JSService Pro – file tree, drag‑and‑drop, CodeMirror editor
+// JSService – generate full JavaScript language as files
 (function() {
-    // ---------- Data structure ----------
+    // ---------- Language data (static representation) ----------
+    // This object describes the JavaScript built‑ins. You can extend it.
+    const languageSpec = {
+        "Global": {
+            type: "folder",
+            children: {
+                "Infinity.js": "// Represents infinity\n// This property is read‑only.\nconsole.log(Infinity);",
+                "NaN.js": "// Not‑a‑Number value\nconsole.log(NaN);",
+                "undefined.js": "// Represents an undefined value\nconsole.log(undefined);",
+                "eval.js": "// Evaluates JavaScript code represented as a string\nfunction eval(code) {\n    // Custom implementation\n}",
+                "isFinite.js": "// Determines whether a value is finite\nfunction isFinite(value) {\n    // Custom implementation\n}",
+                "isNaN.js": "// Determines whether a value is NaN\nfunction isNaN(value) {\n    // Custom implementation\n}",
+                "parseFloat.js": "// Parses a string and returns a floating point number\nfunction parseFloat(string) {\n    // Custom implementation\n}",
+                "parseInt.js": "// Parses a string and returns an integer\nfunction parseInt(string, radix) {\n    // Custom implementation\n}",
+                "decodeURI.js": "// Decodes a URI\nfunction decodeURI(encodedURI) {\n    // Custom implementation\n}",
+                "encodeURI.js": "// Encodes a URI\nfunction encodeURI(uri) {\n    // Custom implementation\n}"
+            }
+        },
+        "Object": {
+            type: "folder",
+            children: {
+                "Static Methods": {
+                    type: "folder",
+                    children: {
+                        "assign.js": "// Copies properties from source objects to target\nObject.assign = function(target, ...sources) {\n    // Custom implementation\n};",
+                        "create.js": "// Creates a new object with the specified prototype\nObject.create = function(proto, propertiesObject) {\n    // Custom implementation\n};",
+                        "defineProperty.js": "// Defines a new property on an object\nObject.defineProperty = function(obj, prop, descriptor) {\n    // Custom implementation\n};",
+                        "entries.js": "// Returns an array of [key, value] pairs\nObject.entries = function(obj) {\n    // Custom implementation\n};",
+                        "freeze.js": "// Freezes an object\nObject.freeze = function(obj) {\n    // Custom implementation\n};",
+                        "getPrototypeOf.js": "// Returns the prototype of an object\nObject.getPrototypeOf = function(obj) {\n    // Custom implementation\n};",
+                        "keys.js": "// Returns an array of property names\nObject.keys = function(obj) {\n    // Custom implementation\n};",
+                        "values.js": "// Returns an array of property values\nObject.values = function(obj) {\n    // Custom implementation\n};"
+                    }
+                },
+                "Prototype Methods": {
+                    type: "folder",
+                    children: {
+                        "hasOwnProperty.js": "// Returns boolean indicating own property\nObject.prototype.hasOwnProperty = function(prop) {\n    // Custom implementation\n};",
+                        "toString.js": "// Returns string representation\nObject.prototype.toString = function() {\n    // Custom implementation\n};",
+                        "valueOf.js": "// Returns primitive value\nObject.prototype.valueOf = function() {\n    // Custom implementation\n};"
+                    }
+                }
+            }
+        },
+        "Array": {
+            type: "folder",
+            children: {
+                "Static Methods": {
+                    type: "folder",
+                    children: {
+                        "from.js": "// Creates array from iterable\nArray.from = function(iterable, mapFn) {\n    // Custom implementation\n};",
+                        "isArray.js": "// Checks if value is array\nArray.isArray = function(value) {\n    // Custom implementation\n};",
+                        "of.js": "// Creates array from arguments\nArray.of = function(...items) {\n    // Custom implementation\n};"
+                    }
+                },
+                "Prototype Methods": {
+                    type: "folder",
+                    children: {
+                        "concat.js": "// Merges arrays\nArray.prototype.concat = function(...args) {\n    // Custom implementation\n};",
+                        "filter.js": "// Filters array\nArray.prototype.filter = function(callback, thisArg) {\n    // Custom implementation\n};",
+                        "forEach.js": "// Executes function for each element\nArray.prototype.forEach = function(callback, thisArg) {\n    // Custom implementation\n};",
+                        "map.js": "// Maps array\nArray.prototype.map = function(callback, thisArg) {\n    // Custom implementation\n};",
+                        "pop.js": "// Removes last element\nArray.prototype.pop = function() {\n    // Custom implementation\n};",
+                        "push.js": "// Adds elements to end\nArray.prototype.push = function(...items) {\n    // Custom implementation\n};",
+                        "reduce.js": "// Reduces array\nArray.prototype.reduce = function(callback, initialValue) {\n    // Custom implementation\n};",
+                        "reverse.js": "// Reverses array\nArray.prototype.reverse = function() {\n    // Custom implementation\n};",
+                        "shift.js": "// Removes first element\nArray.prototype.shift = function() {\n    // Custom implementation\n};",
+                        "slice.js": "// Returns shallow copy\nArray.prototype.slice = function(start, end) {\n    // Custom implementation\n};",
+                        "sort.js": "// Sorts array\nArray.prototype.sort = function(compareFn) {\n    // Custom implementation\n};",
+                        "splice.js": "// Changes array by removing/replacing elements\nArray.prototype.splice = function(start, deleteCount, ...items) {\n    // Custom implementation\n};",
+                        "unshift.js": "// Adds elements to beginning\nArray.prototype.unshift = function(...items) {\n    // Custom implementation\n};"
+                    }
+                }
+            }
+        },
+        "String": {
+            type: "folder",
+            children: {
+                "Static Methods": {
+                    type: "folder",
+                    children: {
+                        "fromCharCode.js": "// Creates string from Unicode values\nString.fromCharCode = function(...codes) {\n    // Custom implementation\n};",
+                        "fromCodePoint.js": "// Creates string from code points\nString.fromCodePoint = function(...codePoints) {\n    // Custom implementation\n};"
+                    }
+                },
+                "Prototype Methods": {
+                    type: "folder",
+                    children: {
+                        "charAt.js": "// Returns character at index\nString.prototype.charAt = function(index) {\n    // Custom implementation\n};",
+                        "concat.js": "// Concatenates strings\nString.prototype.concat = function(...strings) {\n    // Custom implementation\n};",
+                        "includes.js": "// Checks if substring exists\nString.prototype.includes = function(search, start) {\n    // Custom implementation\n};",
+                        "indexOf.js": "// Returns index of first occurrence\nString.prototype.indexOf = function(search, fromIndex) {\n    // Custom implementation\n};",
+                        "match.js": "// Matches regex\nString.prototype.match = function(regexp) {\n    // Custom implementation\n};",
+                        "replace.js": "// Replaces substring\nString.prototype.replace = function(pattern, replacement) {\n    // Custom implementation\n};",
+                        "slice.js": "// Extracts section\nString.prototype.slice = function(start, end) {\n    // Custom implementation\n};",
+                        "split.js": "// Splits into array\nString.prototype.split = function(separator, limit) {\n    // Custom implementation\n};",
+                        "toLowerCase.js": "// Converts to lower case\nString.prototype.toLowerCase = function() {\n    // Custom implementation\n};",
+                        "toUpperCase.js": "// Converts to upper case\nString.prototype.toUpperCase = function() {\n    // Custom implementation\n};",
+                        "trim.js": "// Removes whitespace\nString.prototype.trim = function() {\n    // Custom implementation\n};"
+                    }
+                }
+            }
+        },
+        "Number": {
+            type: "folder",
+            children: {
+                "Static Properties": {
+                    type: "folder",
+                    children: {
+                        "MAX_VALUE.js": "// The maximum numeric value\nconsole.log(Number.MAX_VALUE);",
+                        "MIN_VALUE.js": "// The minimum positive value\nconsole.log(Number.MIN_VALUE);",
+                        "NaN.js": "// Not‑a‑Number\nconsole.log(Number.NaN);",
+                        "POSITIVE_INFINITY.js": "// Infinity\nconsole.log(Number.POSITIVE_INFINITY);"
+                    }
+                },
+                "Static Methods": {
+                    type: "folder",
+                    children: {
+                        "isFinite.js": "// Checks if value is finite\nNumber.isFinite = function(value) {\n    // Custom implementation\n};",
+                        "isInteger.js": "// Checks if value is integer\nNumber.isInteger = function(value) {\n    // Custom implementation\n};",
+                        "isNaN.js": "// Checks if value is NaN\nNumber.isNaN = function(value) {\n    // Custom implementation\n};"
+                    }
+                },
+                "Prototype Methods": {
+                    type: "folder",
+                    children: {
+                        "toFixed.js": "// Formats with fixed decimals\nNumber.prototype.toFixed = function(digits) {\n    // Custom implementation\n};",
+                        "toString.js": "// Returns string representation\nNumber.prototype.toString = function(radix) {\n    // Custom implementation\n};"
+                    }
+                }
+            }
+        },
+        "Math": {
+            type: "folder",
+            children: {
+                "Properties": {
+                    type: "folder",
+                    children: {
+                        "PI.js": "// Ratio of circle circumference to diameter\nconsole.log(Math.PI);",
+                        "E.js": "// Euler's number\nconsole.log(Math.E);"
+                    }
+                },
+                "Methods": {
+                    type: "folder",
+                    children: {
+                        "abs.js": "// Absolute value\nMath.abs = function(x) {\n    // Custom implementation\n};",
+                        "ceil.js": "// Rounds up\nMath.ceil = function(x) {\n    // Custom implementation\n};",
+                        "floor.js": "// Rounds down\nMath.floor = function(x) {\n    // Custom implementation\n};",
+                        "max.js": "// Returns largest\nMath.max = function(...values) {\n    // Custom implementation\n};",
+                        "min.js": "// Returns smallest\nMath.min = function(...values) {\n    // Custom implementation\n};",
+                        "pow.js": "// Raises to power\nMath.pow = function(base, exponent) {\n    // Custom implementation\n};",
+                        "random.js": "// Returns random number\nMath.random = function() {\n    // Custom implementation\n};",
+                        "round.js": "// Rounds to nearest\nMath.round = function(x) {\n    // Custom implementation\n};",
+                        "sqrt.js": "// Square root\nMath.sqrt = function(x) {\n    // Custom implementation\n};"
+                    }
+                }
+            }
+        },
+        "Date": {
+            type: "folder",
+            children: {
+                "Static Methods": {
+                    type: "folder",
+                    children: {
+                        "now.js": "// Returns current timestamp\nDate.now = function() {\n    // Custom implementation\n};",
+                        "parse.js": "// Parses date string\nDate.parse = function(dateString) {\n    // Custom implementation\n};",
+                        "UTC.js": "// Returns UTC timestamp\nDate.UTC = function(year, month, day, hour, minute, second) {\n    // Custom implementation\n};"
+                    }
+                },
+                "Prototype Methods": {
+                    type: "folder",
+                    children: {
+                        "getDate.js": "// Returns day of month\nDate.prototype.getDate = function() {\n    // Custom implementation\n};",
+                        "getDay.js": "// Returns day of week\nDate.prototype.getDay = function() {\n    // Custom implementation\n};",
+                        "getFullYear.js": "// Returns year\nDate.prototype.getFullYear = function() {\n    // Custom implementation\n};",
+                        "getHours.js": "// Returns hours\nDate.prototype.getHours = function() {\n    // Custom implementation\n};",
+                        "getMilliseconds.js": "// Returns milliseconds\nDate.prototype.getMilliseconds = function() {\n    // Custom implementation\n};",
+                        "getMinutes.js": "// Returns minutes\nDate.prototype.getMinutes = function() {\n    // Custom implementation\n};",
+                        "getMonth.js": "// Returns month\nDate.prototype.getMonth = function() {\n    // Custom implementation\n};",
+                        "getSeconds.js": "// Returns seconds\nDate.prototype.getSeconds = function() {\n    // Custom implementation\n};",
+                        "getTime.js": "// Returns timestamp\nDate.prototype.getTime = function() {\n    // Custom implementation\n};"
+                    }
+                }
+            }
+        },
+        "RegExp": {
+            type: "folder",
+            children: {
+                "Prototype Methods": {
+                    type: "folder",
+                    children: {
+                        "exec.js": "// Executes regex\nRegExp.prototype.exec = function(string) {\n    // Custom implementation\n};",
+                        "test.js": "// Tests regex\nRegExp.prototype.test = function(string) {\n    // Custom implementation\n};"
+                    }
+                }
+            }
+        },
+        "Error": {
+            type: "folder",
+            children: {
+                "Prototype Methods": {
+                    type: "folder",
+                    children: {
+                        "toString.js": "// Returns error message\nError.prototype.toString = function() {\n    // Custom implementation\n};"
+                    }
+                }
+            }
+        },
+        "JSON": {
+            type: "folder",
+            children: {
+                "Static Methods": {
+                    type: "folder",
+                    children: {
+                        "parse.js": "// Parses JSON string\nJSON.parse = function(text, reviver) {\n    // Custom implementation\n};",
+                        "stringify.js": "// Converts to JSON string\nJSON.stringify = function(value, replacer, space) {\n    // Custom implementation\n};"
+                    }
+                }
+            }
+        },
+        "Promise": {
+            type: "folder",
+            children: {
+                "Static Methods": {
+                    type: "folder",
+                    children: {
+                        "resolve.js": "// Returns resolved promise\nPromise.resolve = function(value) {\n    // Custom implementation\n};",
+                        "reject.js": "// Returns rejected promise\nPromise.reject = function(reason) {\n    // Custom implementation\n};",
+                        "all.js": "// Waits for all promises\nPromise.all = function(iterable) {\n    // Custom implementation\n};",
+                        "race.js": "// Waits for first promise\nPromise.race = function(iterable) {\n    // Custom implementation\n};"
+                    }
+                },
+                "Prototype Methods": {
+                    type: "folder",
+                    children: {
+                        "then.js": "// Attaches fulfillment handler\nPromise.prototype.then = function(onFulfilled, onRejected) {\n    // Custom implementation\n};",
+                        "catch.js": "// Attaches rejection handler\nPromise.prototype.catch = function(onRejected) {\n    // Custom implementation\n};",
+                        "finally.js": "// Attaches handler regardless\nPromise.prototype.finally = function(onFinally) {\n    // Custom implementation\n};"
+                    }
+                }
+            }
+        }
+    };
+
+    // Helper to convert nested object to our node structure
+    function buildTree(spec, name = 'root') {
+        if (spec.type === 'folder') {
+            const children = [];
+            for (const [key, value] of Object.entries(spec.children)) {
+                if (value.type === 'folder' || typeof value === 'object' && value.children) {
+                    children.push(buildTree(value, key));
+                } else {
+                    // It's a file (string content)
+                    children.push({
+                        name: key,
+                        type: 'file',
+                        content: value
+                    });
+                }
+            }
+            return {
+                name: name,
+                type: 'folder',
+                children: children
+            };
+        } else {
+            // Not used at top level
+            return null;
+        }
+    }
+
+    // The root of our file system
     let root = {
         name: 'root',
         type: 'folder',
-        children: [
-            { name: 'welcome.js', type: 'file', content: '// Welcome to JSService Pro!\nconsole.log("Edit me!");' }
-        ]
+        children: []  // initially empty
     };
 
-    let selectedNode = null;          // currently selected file (for editor)
-    let expandedFolders = new Set();   // store paths of expanded folders, e.g. '/root/folder1'
+    let selectedNode = null;
+    let expandedFolders = new Set();
 
-    // Helper to build a string path for a node (starting from root)
-    function getPath(node, parentPath = '') {
-        if (node === root) return '/root';
-        // This is simplified; we'll store full path as an array of indices during drag/drop.
-        // For expand/collapse we use a unique key: we'll generate an id during rendering.
-        // We'll use a data-path attribute.
-    }
-
-    // We'll assign a unique DOM id during rendering: "node-<random>"
-    // For move operations we need to locate the node in the tree. We'll use a path array of indices.
+    // ---------- Tree utilities ----------
     function findNodeByPath(pathArray) {
         let node = root;
-        for (let i = 1; i < pathArray.length; i++) { // skip root
+        for (let i = 1; i < pathArray.length; i++) {
             const idx = pathArray[i];
             if (node.children && node.children[idx]) {
                 node = node.children[idx];
@@ -59,7 +319,6 @@
             div.setAttribute('draggable', 'true');
             div.setAttribute('data-type', child.type);
 
-            // Toggle for folders
             if (child.type === 'folder') {
                 const toggle = document.createElement('span');
                 toggle.className = 'collapse-toggle';
@@ -75,7 +334,6 @@
                 });
                 div.appendChild(toggle);
             } else {
-                // Add a spacer for alignment
                 const spacer = document.createElement('span');
                 spacer.style.display = 'inline-block';
                 spacer.style.width = '16px';
@@ -87,18 +345,16 @@
             nameSpan.textContent = child.name;
             div.appendChild(nameSpan);
 
-            // Click to select file (or folder for context)
             div.addEventListener('click', (e) => {
                 if (child.type === 'file') {
                     selectFile(child, pathStr);
+                } else {
+                    selectedNode = { node: child, path: pathStr, type: 'folder' };
                 }
-                // For folders, you might want to toggle expand on double-click, but we'll keep single-click for selection too
-                // We'll just select the folder for context (new file creation)
-                selectedNode = { node: child, path: pathStr, type: child.type };
                 highlightSelected(pathStr);
             });
 
-            // Drag events
+            // Drag events for internal moves
             div.addEventListener('dragstart', handleDragStart);
             div.addEventListener('dragover', handleDragOver);
             div.addEventListener('dragleave', handleDragLeave);
@@ -106,7 +362,6 @@
 
             li.appendChild(div);
 
-            // If folder and expanded, render children
             if (child.type === 'folder' && expandedFolders.has(pathStr)) {
                 const childUl = renderTree(document.createElement('ul'), child, currentPath);
                 li.appendChild(childUl);
@@ -123,7 +378,6 @@
     function refreshTree() {
         const container = document.getElementById('tree-container');
         renderTree(container, root, [0]);
-        // Re-highlight selected file
         if (selectedNode && selectedNode.path) {
             highlightSelected(selectedNode.path);
         }
@@ -148,6 +402,7 @@
         document.getElementById('current-file').textContent = fileNode.name;
         editor.setValue(fileNode.content || '');
         highlightSelected(pathStr);
+        document.getElementById('output').style.display = 'none';
     }
 
     document.getElementById('save-file').addEventListener('click', () => {
@@ -159,12 +414,12 @@
         }
     });
 
-    // ---------- New file / folder ----------
+    // ---------- New file / folder (same as before) ----------
     function getSelectedFolder() {
         if (selectedNode && selectedNode.type === 'folder') {
             return selectedNode.node;
         }
-        return root; // default to root
+        return root;
     }
 
     document.getElementById('new-file').addEventListener('click', () => {
@@ -186,7 +441,7 @@
         refreshTree();
     });
 
-    // ---------- Drag and drop ----------
+    // ---------- Drag and drop (internal) ----------
     let draggedPath = null;
 
     function handleDragStart(e) {
@@ -219,38 +474,98 @@
 
         const targetPath = targetDiv.dataset.path;
         const targetNode = findNodeByPath(targetPath.split(',').map(Number));
-        if (!targetNode || targetNode.type !== 'folder') return; // only folders are drop targets
+        if (!targetNode || targetNode.type !== 'folder') return;
 
         if (!draggedPath) return;
         const sourcePathArr = draggedPath.split(',').map(Number);
         const sourceNode = findNodeByPath(sourcePathArr);
         if (!sourceNode) return;
 
-        // Prevent dropping onto itself or its descendants
         if (sourcePathArr.join(',') === targetPath) return;
-        // Check if target is inside source (would create cycle)
         if (targetPath.startsWith(draggedPath + ',')) {
             alert('Cannot move a folder into its own descendant.');
             return;
         }
 
-        // Remove source from its parent
         const { parent: sourceParent, index: sourceIndex } = findParentAndIndex(sourcePathArr);
         if (sourceParent) {
             sourceParent.children.splice(sourceIndex, 1);
         }
 
-        // Add to target folder
         targetNode.children.push(sourceNode);
-
-        // Expand target folder to show result
         expandedFolders.add(targetPath);
-
         refreshTree();
         draggedPath = null;
     }
 
-    // ---------- Context menu for rename/delete (basic) ----------
+    // ---------- Generate language tree from spec ----------
+    function loadLanguageTree() {
+        // Convert the languageSpec into our node structure
+        const languageRoot = {
+            name: 'JavaScript Language',
+            type: 'folder',
+            children: []
+        };
+        for (const [key, value] of Object.entries(languageSpec)) {
+            if (value.type === 'folder') {
+                const folder = {
+                    name: key,
+                    type: 'folder',
+                    children: []
+                };
+                // Recursively add children
+                function addChildren(parentSpec, parentNode) {
+                    for (const [childKey, childValue] of Object.entries(parentSpec.children)) {
+                        if (childValue.type === 'folder') {
+                            const subFolder = {
+                                name: childKey,
+                                type: 'folder',
+                                children: []
+                            };
+                            parentNode.children.push(subFolder);
+                            addChildren(childValue, subFolder);
+                        } else {
+                            // It's a file with content
+                            parentNode.children.push({
+                                name: childKey,
+                                type: 'file',
+                                content: childValue
+                            });
+                        }
+                    }
+                }
+                addChildren(value, folder);
+                languageRoot.children.push(folder);
+            }
+        }
+        // Replace root children with language tree
+        root.children = languageRoot.children;
+        // Expand all top‑level folders for better visibility
+        expandedFolders.clear();
+        refreshTree();
+        document.getElementById('status').textContent = 'JavaScript language tree loaded.';
+    }
+
+    // ---------- Handle file drops: trigger language generation ----------
+    const dropZone = document.getElementById('dropZone');
+    dropZone.addEventListener('dragover', (e) => {
+        e.preventDefault();
+        dropZone.classList.add('dragover');
+    });
+    dropZone.addEventListener('dragleave', (e) => {
+        dropZone.classList.remove('dragover');
+    });
+    dropZone.addEventListener('drop', (e) => {
+        e.preventDefault();
+        dropZone.classList.remove('dragover');
+        // Ignore the actual file – just generate the language tree
+        loadLanguageTree();
+    });
+
+    // Also add a button to load manually
+    document.getElementById('load-language').addEventListener('click', loadLanguageTree);
+
+    // ---------- Context menu (rename/delete) ----------
     document.addEventListener('contextmenu', (e) => {
         const div = e.target.closest('[data-path]');
         if (!div) return;
@@ -304,10 +619,50 @@
         });
     });
 
-    // ---------- Initial render ----------
+    // ---------- Run file (sandboxed) ----------
+    document.getElementById('run-file').addEventListener('click', () => {
+        if (!selectedNode || selectedNode.type !== 'file') {
+            alert('Select a JavaScript file to run.');
+            return;
+        }
+
+        const code = editor.getValue();
+        if (!confirm('You are about to execute this code in a sandboxed iframe. You are solely responsible for what it does. Continue?')) {
+            return;
+        }
+
+        const iframe = document.createElement('iframe');
+        iframe.style.display = 'none';
+        iframe.sandbox = 'allow-scripts';
+        document.body.appendChild(iframe);
+
+        const outputDiv = document.getElementById('output');
+        outputDiv.style.display = 'block';
+        outputDiv.textContent = '';
+
+        const iframeWindow = iframe.contentWindow;
+        iframeWindow.console.log = (...args) => {
+            outputDiv.textContent += args.map(arg => 
+                typeof arg === 'object' ? JSON.stringify(arg, null, 2) : String(arg)
+            ).join(' ') + '\n';
+        };
+        iframeWindow.console.error = (...args) => {
+            outputDiv.textContent += 'ERROR: ' + args.map(arg => String(arg)).join(' ') + '\n';
+        };
+
+        try {
+            const script = iframeWindow.document.createElement('script');
+            script.textContent = code;
+            iframeWindow.document.body.appendChild(script);
+        } catch (e) {
+            outputDiv.textContent += 'Execution error: ' + e.message;
+        }
+
+        setTimeout(() => {
+            document.body.removeChild(iframe);
+        }, 1000);
+    });
+
+    // ---------- Initial render (empty) ----------
     refreshTree();
-    // Select the first file by default
-    if (root.children.length > 0 && root.children[0].type === 'file') {
-        selectFile(root.children[0], '0,0');
-    }
 })();
